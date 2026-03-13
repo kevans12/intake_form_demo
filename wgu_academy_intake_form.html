@@ -1,0 +1,1218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>WGU Academy — Intake Form</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy:    #00285E;
+      --navy-dk: #001A3D;
+      --blue:    #0064A4;
+      --blue-lt: #E8F2FB;
+      --gold:    #FFC72C;
+      --text:    #1A2332;
+      --muted:   #5A6677;
+      --border:  #C8D4E0;
+      --white:   #FFFFFF;
+      --bg:      #F4F7FA;
+      --success: #1D7D3A;
+      --success-lt: #E8F5EC;
+      --error:   #C0392B;
+      --radius:  8px;
+      --shadow:  0 2px 12px rgba(0,40,94,0.10);
+    }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 0 0 60px;
+    }
+
+    /* ── Header ── */
+    header {
+      background: linear-gradient(135deg, var(--navy-dk) 0%, var(--navy) 60%, var(--blue) 100%);
+      color: var(--white);
+      padding: 32px 24px 28px;
+      text-align: center;
+    }
+    header .logo-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+    header .logo-icon {
+      width: 48px; height: 48px;
+      background: var(--gold);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-weight: 900; font-size: 22px; color: var(--navy-dk);
+      flex-shrink: 0;
+    }
+    header h1 {
+      font-size: clamp(20px, 4vw, 28px);
+      font-weight: 700;
+      letter-spacing: -0.3px;
+    }
+    header p {
+      font-size: 15px;
+      color: rgba(255,255,255,0.80);
+      max-width: 560px;
+      margin: 0 auto;
+      line-height: 1.5;
+    }
+
+    /* ── Progress bar ── */
+    .progress-wrap {
+      background: var(--white);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 24px;
+      position: sticky; top: 0; z-index: 50;
+    }
+    .progress-steps {
+      display: flex;
+      align-items: center;
+      max-width: 700px;
+      margin: 0 auto;
+      gap: 0;
+    }
+    .step-item {
+      display: flex; align-items: center; gap: 8px;
+      flex: 1;
+    }
+    .step-item:last-child { flex: none; }
+    .step-dot {
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700;
+      background: var(--border);
+      color: var(--muted);
+      flex-shrink: 0;
+      transition: all .25s;
+    }
+    .step-dot.active { background: var(--blue); color: #fff; }
+    .step-dot.done   { background: var(--success); color: #fff; }
+    .step-label {
+      font-size: 12px; color: var(--muted); white-space: nowrap;
+      display: none;
+    }
+    @media(min-width:520px){ .step-label { display: block; } }
+    .step-line {
+      flex: 1; height: 2px; background: var(--border);
+      margin: 0 6px;
+      transition: background .25s;
+    }
+    .step-line.done { background: var(--success); }
+
+    /* ── Card ── */
+    .card {
+      background: var(--white);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      max-width: 700px;
+      margin: 32px auto 0;
+      padding: 36px 40px;
+    }
+    @media(max-width:600px){ .card { margin: 16px 12px 0; padding: 24px 20px; } }
+
+    .card-title {
+      font-size: 20px; font-weight: 700;
+      color: var(--navy);
+      margin-bottom: 6px;
+    }
+    .card-subtitle {
+      font-size: 14px; color: var(--muted);
+      margin-bottom: 28px;
+      line-height: 1.5;
+    }
+
+    /* ── Category tiles ── */
+    .tile-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .tile {
+      border: 2px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px 14px 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all .18s;
+      background: var(--white);
+      user-select: none;
+    }
+    .tile:hover { border-color: var(--blue); background: var(--blue-lt); }
+    .tile.selected { border-color: var(--blue); background: var(--blue-lt); box-shadow: 0 0 0 3px rgba(0,100,164,0.15); }
+    .tile-icon { font-size: 30px; margin-bottom: 8px; line-height: 1; }
+    .tile-label { font-size: 14px; font-weight: 600; color: var(--navy); }
+    .tile-desc  { font-size: 11px; color: var(--muted); margin-top: 4px; line-height: 1.4; }
+
+    /* ── Sub-option pills ── */
+    .pill-group { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 24px; }
+    .pill {
+      border: 2px solid var(--border);
+      border-radius: 999px;
+      padding: 8px 18px;
+      font-size: 13px; font-weight: 600;
+      cursor: pointer;
+      transition: all .15s;
+      background: var(--white);
+      user-select: none;
+    }
+    .pill:hover { border-color: var(--blue); color: var(--blue); background: var(--blue-lt); }
+    .pill.selected { border-color: var(--blue); background: var(--blue); color: #fff; }
+
+    /* ── Form fields ── */
+    .field-group { display: flex; flex-direction: column; gap: 20px; }
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field.half-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    @media(max-width:520px){ .field.half-grid { grid-template-columns: 1fr; } }
+
+    label {
+      font-size: 13px; font-weight: 600; color: var(--navy);
+    }
+    label .req { color: var(--error); margin-left: 2px; }
+    label .hint { font-weight: 400; color: var(--muted); margin-left: 4px; font-size: 12px; }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="date"],
+    select,
+    textarea {
+      border: 1.5px solid var(--border);
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-size: 14px;
+      color: var(--text);
+      background: var(--white);
+      transition: border-color .15s, box-shadow .15s;
+      font-family: inherit;
+      width: 100%;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(0,100,164,0.12);
+    }
+    textarea { resize: vertical; min-height: 100px; }
+    select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%235A6677' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 32px; }
+
+    .radio-group { display: flex; gap: 16px; flex-wrap: wrap; }
+    .radio-opt {
+      display: flex; align-items: center; gap: 7px;
+      cursor: pointer; font-size: 14px;
+    }
+    .radio-opt input[type="radio"] { accent-color: var(--blue); width: 16px; height: 16px; }
+
+    /* ── Section divider ── */
+    .section-divider {
+      border: none; border-top: 1px solid var(--border);
+      margin: 20px 0;
+    }
+    .section-heading {
+      font-size: 12px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .6px;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+
+    /* ── Buttons ── */
+    .btn-row { display: flex; justify-content: space-between; align-items: center; margin-top: 32px; gap: 12px; }
+    .btn {
+      padding: 11px 28px;
+      border-radius: 6px;
+      font-size: 14px; font-weight: 600;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: all .15s;
+      font-family: inherit;
+    }
+    .btn-primary { background: var(--blue); color: #fff; }
+    .btn-primary:hover { background: var(--navy); }
+    .btn-primary:disabled { background: var(--border); color: var(--muted); cursor: not-allowed; }
+    .btn-secondary { background: transparent; color: var(--blue); border-color: var(--blue); }
+    .btn-secondary:hover { background: var(--blue-lt); }
+    .btn-ghost { background: transparent; color: var(--muted); border-color: transparent; font-weight: 400; }
+    .btn-ghost:hover { color: var(--navy); }
+
+    /* ── Success screen ── */
+    .success-card {
+      background: var(--success-lt);
+      border: 1.5px solid #9DCBA9;
+      border-radius: var(--radius);
+      max-width: 700px;
+      margin: 32px auto 0;
+      padding: 48px 40px;
+      text-align: center;
+    }
+    @media(max-width:600px){ .success-card { margin: 16px 12px 0; padding: 32px 20px; } }
+    .success-icon { font-size: 52px; margin-bottom: 16px; }
+    .success-card h2 { color: var(--success); font-size: 22px; margin-bottom: 10px; }
+    .success-card p  { color: #2E6B3A; font-size: 15px; line-height: 1.6; margin-bottom: 6px; }
+    .ref-badge {
+      display: inline-block;
+      background: var(--white); border: 1px solid #9DCBA9;
+      border-radius: 6px; padding: 10px 20px;
+      font-size: 13px; color: var(--success); font-weight: 700;
+      margin: 16px 0 24px; letter-spacing: .5px;
+    }
+
+    /* ── Hidden ── */
+    .hidden { display: none !important; }
+
+    /* ── Validation error ── */
+    .field-error { font-size: 12px; color: var(--error); margin-top: 2px; }
+    input.invalid, select.invalid, textarea.invalid {
+      border-color: var(--error);
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo-bar">
+    <div class="logo-icon">W</div>
+    <h1>WGU Academy</h1>
+  </div>
+  <p>Use this form to submit ideas, requests, issues, and more to the WGU Academy team.</p>
+</header>
+
+<!-- Progress -->
+<div class="progress-wrap">
+  <div class="progress-steps" id="progressSteps">
+    <div class="step-item">
+      <div class="step-dot active" id="dot1">1</div>
+      <span class="step-label">Category</span>
+    </div>
+    <div class="step-line" id="line1"></div>
+    <div class="step-item">
+      <div class="step-dot" id="dot2">2</div>
+      <span class="step-label">Type</span>
+    </div>
+    <div class="step-line" id="line2"></div>
+    <div class="step-item">
+      <div class="step-dot" id="dot3">3</div>
+      <span class="step-label">Details</span>
+    </div>
+    <div class="step-line" id="line3"></div>
+    <div class="step-item">
+      <div class="step-dot" id="dot4">4</div>
+      <span class="step-label">Review & Submit</span>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════ STEP 1 ════════════════════════════════ -->
+<div class="card" id="step1">
+  <div class="card-title">What are you submitting?</div>
+  <div class="card-subtitle">Choose the category that best describes your request.</div>
+  <div class="tile-grid">
+    <div class="tile" data-cat="Technology" onclick="selectCategory(this)">
+      <div class="tile-icon">💻</div>
+      <div class="tile-label">Technology</div>
+      <div class="tile-desc">Integrations, features, bugs, Salesforce</div>
+    </div>
+    <div class="tile" data-cat="Improvement" onclick="selectCategory(this)">
+      <div class="tile-icon">💡</div>
+      <div class="tile-label">Improvement</div>
+      <div class="tile-desc">Process & experience improvements</div>
+    </div>
+    <div class="tile" data-cat="Course" onclick="selectCategory(this)">
+      <div class="tile-icon">📚</div>
+      <div class="tile-label">Course</div>
+      <div class="tile-desc">New ideas, edits, or sunsets</div>
+    </div>
+    <div class="tile" data-cat="Account" onclick="selectCategory(this)">
+      <div class="tile-icon">🔑</div>
+      <div class="tile-label">Account</div>
+      <div class="tile-desc">Access requests for platforms</div>
+    </div>
+  </div>
+  <div class="btn-row">
+    <span></span>
+    <button class="btn btn-primary" id="step1Next" disabled onclick="goToStep(2)">Next →</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════ STEP 2 ════════════════════════════════ -->
+<div class="card hidden" id="step2">
+  <div class="card-title" id="step2Title">Select a type</div>
+  <div class="card-subtitle" id="step2Sub">Choose the specific type that applies to your request.</div>
+
+  <!-- Technology sub-types -->
+  <div id="subTech" class="hidden">
+    <div class="pill-group">
+      <div class="pill" data-sub="Integration" onclick="selectSub(this)">🔗 Integration</div>
+      <div class="pill" data-sub="Feature"      onclick="selectSub(this)">✨ Feature Request</div>
+      <div class="pill" data-sub="Bug"          onclick="selectSub(this)">🐛 Bug Report</div>
+      <div class="pill" data-sub="Salesforce"   onclick="selectSub(this)">☁️ Salesforce</div>
+    </div>
+  </div>
+
+  <!-- Improvement sub-types -->
+  <div id="subImprov" class="hidden">
+    <div class="pill-group">
+      <div class="pill" data-sub="Staff"   onclick="selectSub(this)">👩‍💼 Staff-Facing</div>
+      <div class="pill" data-sub="Student" onclick="selectSub(this)">🎓 Student-Facing</div>
+    </div>
+  </div>
+
+  <!-- Course sub-types -->
+  <div id="subCourse" class="hidden">
+    <div class="pill-group">
+      <div class="pill" data-sub="New Course"    onclick="selectSub(this)">➕ New Course Idea</div>
+      <div class="pill" data-sub="Edit Course"   onclick="selectSub(this)">✏️ Edit a Course</div>
+      <div class="pill" data-sub="Sunset Course" onclick="selectSub(this)">🌅 Sunset a Course</div>
+    </div>
+  </div>
+
+  <!-- Account sub-types -->
+  <div id="subAccount" class="hidden">
+    <div class="pill-group">
+      <div class="pill" data-sub="Salesforce Access" onclick="selectSub(this)">☁️ Salesforce</div>
+      <div class="pill" data-sub="Tableau Access"    onclick="selectSub(this)">📊 Tableau</div>
+      <div class="pill" data-sub="Other Access"      onclick="selectSub(this)">🔐 Other</div>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-ghost" onclick="goToStep(1)">← Back</button>
+    <button class="btn btn-primary" id="step2Next" disabled onclick="goToStep(3)">Next →</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════ STEP 3 ════════════════════════════════ -->
+<div class="card hidden" id="step3">
+  <div class="card-title" id="step3Title">Details</div>
+  <div class="card-subtitle">Fill in all required fields marked with <span style="color:var(--error)">*</span></div>
+
+  <!-- ── CONTACT (shared top section) ── -->
+  <div class="section-heading">Your Contact Info</div>
+  <div class="field-group" style="margin-bottom:20px;">
+    <div class="field half-grid">
+      <div class="field">
+        <label for="contactName">Full Name <span class="req">*</span></label>
+        <input type="text" id="contactName" placeholder="Jane Smith" />
+      </div>
+      <div class="field">
+        <label for="contactEmail">Email Address <span class="req">*</span></label>
+        <input type="email" id="contactEmail" placeholder="jane.smith@wgu.edu" />
+      </div>
+    </div>
+    <div class="field">
+      <label for="contactDept">Department / Team <span class="req">*</span></label>
+      <input type="text" id="contactDept" placeholder="e.g. Curriculum, Technology, Student Success" />
+    </div>
+  </div>
+  <hr class="section-divider">
+
+  <!-- ══ TECHNOLOGY: Integration ══ -->
+  <div id="fields-Integration" class="hidden field-group">
+    <div class="section-heading">Integration Request</div>
+    <div class="field">
+      <label for="intName">Integration Name / Systems Involved <span class="req">*</span></label>
+      <input type="text" id="intName" placeholder="e.g. Canvas ↔ Salesforce sync" />
+    </div>
+    <div class="field">
+      <label for="intDesc">Description <span class="req">*</span><span class="hint">What should the integration do?</span></label>
+      <textarea id="intDesc" placeholder="Describe the expected data flow, trigger events, and goals..."></textarea>
+    </div>
+    <div class="field">
+      <label for="intBusiness">Business Justification <span class="req">*</span></label>
+      <textarea id="intBusiness" placeholder="Why is this integration needed? What problem does it solve?" style="min-height:80px;"></textarea>
+    </div>
+    <div class="field half-grid">
+      <div class="field">
+        <label for="intPriority">Priority <span class="req">*</span></label>
+        <select id="intPriority">
+          <option value="">— Select —</option>
+          <option>🔴 Critical</option>
+          <option>🟠 High</option>
+          <option>🟡 Medium</option>
+          <option>🟢 Low</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="intDate">Target Date</label>
+        <input type="date" id="intDate" />
+      </div>
+    </div>
+    <div class="field">
+      <label for="intStakeholders">Key Stakeholders / Approvers</label>
+      <input type="text" id="intStakeholders" placeholder="Names or teams who need to be involved" />
+    </div>
+  </div>
+
+  <!-- ══ TECHNOLOGY: Feature ══ -->
+  <div id="fields-Feature" class="hidden field-group">
+    <div class="section-heading">Feature Request</div>
+    <div class="field">
+      <label for="featName">Feature Name <span class="req">*</span></label>
+      <input type="text" id="featName" placeholder="Short, descriptive name for the feature" />
+    </div>
+    <div class="field">
+      <label for="featDesc">Description <span class="req">*</span><span class="hint">What should it do?</span></label>
+      <textarea id="featDesc" placeholder="Describe the feature, user story, or workflow enhancement..."></textarea>
+    </div>
+    <div class="field">
+      <label for="featJustify">Business Justification <span class="req">*</span></label>
+      <textarea id="featJustify" placeholder="Why is this needed? Who benefits and how?" style="min-height:80px;"></textarea>
+    </div>
+    <div class="field">
+      <label>Audience Impacted <span class="req">*</span></label>
+      <div class="radio-group">
+        <label class="radio-opt"><input type="radio" name="featAudience" value="Students"> Students</label>
+        <label class="radio-opt"><input type="radio" name="featAudience" value="Staff"> Staff</label>
+        <label class="radio-opt"><input type="radio" name="featAudience" value="Both"> Both</label>
+        <label class="radio-opt"><input type="radio" name="featAudience" value="Internal / Admin"> Internal / Admin</label>
+      </div>
+    </div>
+    <div class="field half-grid">
+      <div class="field">
+        <label for="featPriority">Priority <span class="req">*</span></label>
+        <select id="featPriority">
+          <option value="">— Select —</option>
+          <option>🔴 Critical</option>
+          <option>🟠 High</option>
+          <option>🟡 Medium</option>
+          <option>🟢 Low</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="featDate">Target Date</label>
+        <input type="date" id="featDate" />
+      </div>
+    </div>
+    <div class="field">
+      <label for="featAttach">Supporting Links / References <span class="hint">(optional)</span></label>
+      <input type="text" id="featAttach" placeholder="Mockups, Confluence links, JIRA tickets, etc." />
+    </div>
+  </div>
+
+  <!-- ══ TECHNOLOGY: Bug ══ -->
+  <div id="fields-Bug" class="hidden field-group">
+    <div class="section-heading">Bug Report</div>
+    <div class="field">
+      <label for="bugTitle">Bug Title <span class="req">*</span></label>
+      <input type="text" id="bugTitle" placeholder="Short summary of the issue" />
+    </div>
+    <div class="field">
+      <label for="bugSystem">Affected System / Platform <span class="req">*</span></label>
+      <input type="text" id="bugSystem" placeholder="e.g. Student Portal, Canvas, Salesforce, Mobile App" />
+    </div>
+    <div class="field">
+      <label for="bugSteps">Steps to Reproduce <span class="req">*</span></label>
+      <textarea id="bugSteps" placeholder="1. Go to...&#10;2. Click on...&#10;3. Observe that..."></textarea>
+    </div>
+    <div class="field">
+      <label for="bugExpected">Expected vs. Actual Behavior <span class="req">*</span></label>
+      <textarea id="bugExpected" placeholder="Expected: The page should load in under 3 seconds.&#10;Actual: The page times out after 30 seconds." style="min-height:80px;"></textarea>
+    </div>
+    <div class="field half-grid">
+      <div class="field">
+        <label for="bugSeverity">Severity <span class="req">*</span></label>
+        <select id="bugSeverity">
+          <option value="">— Select —</option>
+          <option>🔴 Critical — System down / data loss</option>
+          <option>🟠 High — Major feature broken</option>
+          <option>🟡 Medium — Workaround exists</option>
+          <option>🟢 Low — Minor / cosmetic</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="bugUsers">Approx. Users Affected</label>
+        <input type="text" id="bugUsers" placeholder="e.g. ~200 students, All staff" />
+      </div>
+    </div>
+    <div class="field">
+      <label for="bugEnv">Environment <span class="hint">(browser, OS, device)</span></label>
+      <input type="text" id="bugEnv" placeholder="e.g. Chrome 124, Windows 11, Desktop" />
+    </div>
+    <div class="field">
+      <label for="bugNotes">Additional Notes / Screenshots</label>
+      <textarea id="bugNotes" placeholder="Paste links to screenshots, error messages, or any extra context..." style="min-height:70px;"></textarea>
+    </div>
+  </div>
+
+  <!-- ══ TECHNOLOGY: Salesforce ══ -->
+  <div id="fields-Salesforce" class="hidden field-group">
+    <div class="section-heading">Salesforce Request</div>
+    <div class="field">
+      <label for="sfType">Request Type <span class="req">*</span></label>
+      <select id="sfType">
+        <option value="">— Select —</option>
+        <option>New Report / Dashboard</option>
+        <option>Workflow / Automation</option>
+        <option>Custom Field / Object</option>
+        <option>Data Fix / Cleanup</option>
+        <option>Permission / Profile Change</option>
+        <option>Integration</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="sfDesc">Description <span class="req">*</span></label>
+      <textarea id="sfDesc" placeholder="Describe what you need built, changed, or fixed in Salesforce..."></textarea>
+    </div>
+    <div class="field">
+      <label for="sfJustify">Business Need <span class="req">*</span></label>
+      <textarea id="sfJustify" placeholder="Why is this needed? What outcome are you trying to achieve?" style="min-height:80px;"></textarea>
+    </div>
+    <div class="field half-grid">
+      <div class="field">
+        <label for="sfPriority">Priority <span class="req">*</span></label>
+        <select id="sfPriority">
+          <option value="">— Select —</option>
+          <option>🔴 Critical</option>
+          <option>🟠 High</option>
+          <option>🟡 Medium</option>
+          <option>🟢 Low</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="sfDate">Target Date</label>
+        <input type="date" id="sfDate" />
+      </div>
+    </div>
+    <div class="field">
+      <label for="sfUsers">Who Will Use This?</label>
+      <input type="text" id="sfUsers" placeholder="e.g. Enrollment team, all advisors, leadership only" />
+    </div>
+  </div>
+
+  <!-- ══ IMPROVEMENT ══ -->
+  <div id="fields-Improvement" class="hidden field-group">
+    <div class="section-heading">Improvement Details</div>
+    <div class="field">
+      <label for="impTitle">Improvement Title <span class="req">*</span></label>
+      <input type="text" id="impTitle" placeholder="Brief, descriptive title for this improvement" />
+    </div>
+    <div class="field">
+      <label for="impDesc">Description <span class="req">*</span><span class="hint">What should change and why?</span></label>
+      <textarea id="impDesc" placeholder="Describe the current state, the problem or gap, and what the improved state would look like..."></textarea>
+    </div>
+    <div class="field">
+      <label for="impOkr">OKR / Strategic Goal Impacted <span class="req">*</span></label>
+      <input type="text" id="impOkr" placeholder="e.g. Increase student retention by 10%, Reduce advisor workload" />
+    </div>
+    <div class="field">
+      <label for="impOutcome">Expected Outcome / Success Metrics <span class="req">*</span></label>
+      <textarea id="impOutcome" placeholder="How will we know this improvement was successful? What will change?" style="min-height:80px;"></textarea>
+    </div>
+    <div class="field">
+      <label for="impCurrentPain">Current Pain Points</label>
+      <textarea id="impCurrentPain" placeholder="What specific frustrations, inefficiencies, or gaps does this address?" style="min-height:80px;"></textarea>
+    </div>
+    <div class="field half-grid">
+      <div class="field">
+        <label for="impPriority">Priority <span class="req">*</span></label>
+        <select id="impPriority">
+          <option value="">— Select —</option>
+          <option>🔴 Critical</option>
+          <option>🟠 High</option>
+          <option>🟡 Medium</option>
+          <option>🟢 Low</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="impDate">Target Date <span class="hint">(if applicable)</span></label>
+        <input type="date" id="impDate" />
+      </div>
+    </div>
+    <div class="field">
+      <label for="impStakeholders">Other Stakeholders to Involve</label>
+      <input type="text" id="impStakeholders" placeholder="Names or teams who should be part of this effort" />
+    </div>
+  </div>
+
+  <!-- ══ COURSE: New Course Idea ══ -->
+  <div id="fields-New Course" class="hidden field-group">
+    <div class="section-heading">New Course Idea</div>
+    <div class="field">
+      <label for="ncTitle">Proposed Course Title <span class="req">*</span></label>
+      <input type="text" id="ncTitle" placeholder="Working title for the new course" />
+    </div>
+    <div class="field">
+      <label for="ncDesc">Course Description <span class="req">*</span><span class="hint">Summary of content and learning goals</span></label>
+      <textarea id="ncDesc" placeholder="Describe what the course would cover, key learning outcomes, and how it fits into the WGU Academy catalog..."></textarea>
+    </div>
+    <div class="field">
+      <label for="ncAudience">Target Audience <span class="req">*</span></label>
+      <input type="text" id="ncAudience" placeholder="e.g. First-year students, transfer students, working adults" />
+    </div>
+    <div class="field">
+      <label for="ncRationale">Business / Academic Rationale <span class="req">*</span></label>
+      <textarea id="ncRationale" placeholder="Why should WGU Academy offer this course? What gap does it fill?" style="min-height:80px;"></textarea>
+    </div>
+    <div class="field half-grid">
+      <div class="field">
+        <label for="ncSME">Subject Matter Expert (SME)</label>
+        <input type="text" id="ncSME" placeholder="Name or area — if known" />
+      </div>
+      <div class="field">
+        <label for="ncDate">Desired Launch Date</label>
+        <input type="date" id="ncDate" />
+      </div>
+    </div>
+    <div class="field">
+      <label for="ncCredits">Credit Hours / Length <span class="hint">(if applicable)</span></label>
+      <input type="text" id="ncCredits" placeholder="e.g. 3 credit hours, 6 weeks" />
+    </div>
+    <div class="field">
+      <label for="ncNotes">Additional Notes</label>
+      <textarea id="ncNotes" placeholder="Competitor courses, industry trends, student demand data, etc." style="min-height:70px;"></textarea>
+    </div>
+  </div>
+
+  <!-- ══ COURSE: Edit a Course ══ -->
+  <div id="fields-Edit Course" class="hidden field-group">
+    <div class="section-heading">Course Edit Request</div>
+    <div class="field">
+      <label for="ecCourseName">Course Name / ID <span class="req">*</span></label>
+      <input type="text" id="ecCourseName" placeholder="Full course name and/or course code" />
+    </div>
+    <div class="field">
+      <label for="ecEditType">Type of Edit <span class="req">*</span></label>
+      <select id="ecEditType">
+        <option value="">— Select —</option>
+        <option>Content Update (module / lesson)</option>
+        <option>Assessment Change</option>
+        <option>Learning Outcomes Revision</option>
+        <option>Media / Video Update</option>
+        <option>Accessibility Fix</option>
+        <option>Course Structure Reorganization</option>
+        <option>Minor Correction (typo, link, formatting)</option>
+        <option>Other</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="ecDesc">Description of Requested Changes <span class="req">*</span></label>
+      <textarea id="ecDesc" placeholder="Be as specific as possible — include module names, page numbers, or section titles where applicable..."></textarea>
+    </div>
+    <div class="field">
+      <label for="ecReason">Reason for Edit <span class="req">*</span></label>
+      <textarea id="ecReason" placeholder="Why is this change needed? e.g. outdated content, student feedback, accreditation requirement..." style="min-height:80px;"></textarea>
+    </div>
+    <div class="field half-grid">
+      <div class="field">
+        <label for="ecPriority">Priority <span class="req">*</span></label>
+        <select id="ecPriority">
+          <option value="">— Select —</option>
+          <option>🔴 Critical (errors / compliance)</option>
+          <option>🟠 High</option>
+          <option>🟡 Medium</option>
+          <option>🟢 Low</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="ecDate">Requested Completion Date</label>
+        <input type="date" id="ecDate" />
+      </div>
+    </div>
+    <div class="field">
+      <label for="ecSME">SME / Course Owner</label>
+      <input type="text" id="ecSME" placeholder="Who should be consulted on this change?" />
+    </div>
+  </div>
+
+  <!-- ══ COURSE: Sunset a Course ══ -->
+  <div id="fields-Sunset Course" class="hidden field-group">
+    <div class="section-heading">Course Sunset Request</div>
+    <div class="field">
+      <label for="scCourseName">Course Name / ID <span class="req">*</span></label>
+      <input type="text" id="scCourseName" placeholder="Full course name and/or course code" />
+    </div>
+    <div class="field">
+      <label for="scReason">Reason for Sunsetting <span class="req">*</span></label>
+      <textarea id="scReason" placeholder="Why should this course be retired? e.g. low enrollment, replaced by new course, outdated content..."></textarea>
+    </div>
+    <div class="field">
+      <label for="scStudents">Current Enrollment Impact</label>
+      <input type="text" id="scStudents" placeholder="How many active students are enrolled? What is the plan for them?" />
+    </div>
+    <div class="field">
+      <label for="scReplacement">Replacement Course <span class="hint">(if applicable)</span></label>
+      <input type="text" id="scReplacement" placeholder="Name / ID of the course that will replace this one, if any" />
+    </div>
+    <div class="field half-grid">
+      <div class="field">
+        <label for="scDate">Proposed Sunset Date <span class="req">*</span></label>
+        <input type="date" id="scDate" />
+      </div>
+      <div class="field">
+        <label for="scApprover">Approving Stakeholder</label>
+        <input type="text" id="scApprover" placeholder="Name / title of the approver" />
+      </div>
+    </div>
+    <div class="field">
+      <label for="scNotes">Additional Notes</label>
+      <textarea id="scNotes" placeholder="Anything else the team should know before sunsetting this course..." style="min-height:70px;"></textarea>
+    </div>
+  </div>
+
+  <!-- ══ ACCOUNT ══ -->
+  <div id="fields-Account" class="hidden field-group">
+    <div class="section-heading">Access Request Details</div>
+    <div id="accountPlatformLabel" class="field">
+      <label for="accPlatformOther">Platform / Tool Name <span class="req">*</span></label>
+      <input type="text" id="accPlatformOther" placeholder="Name of the tool or system you need access to" />
+    </div>
+    <div class="field">
+      <label for="accWho">Who Needs Access? <span class="req">*</span></label>
+      <input type="text" id="accWho" placeholder="Full name(s) and email address(es)" />
+    </div>
+    <div class="field">
+      <label for="accRole">Role / Job Title <span class="req">*</span></label>
+      <input type="text" id="accRole" placeholder="What is their position at WGU Academy?" />
+    </div>
+    <div class="field">
+      <label for="accLevel">Access Level Needed <span class="req">*</span></label>
+      <select id="accLevel">
+        <option value="">— Select —</option>
+        <option>Read Only / Viewer</option>
+        <option>Standard User / Editor</option>
+        <option>Manager / Team Lead</option>
+        <option>Admin</option>
+        <option>Custom — describe in notes below</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for="accJustify">Business Justification <span class="req">*</span></label>
+      <textarea id="accJustify" placeholder="Why does this person need access? What will they be doing with it?" style="min-height:80px;"></textarea>
+    </div>
+    <div class="field half-grid">
+      <div class="field">
+        <label for="accManager">Manager / Approver <span class="req">*</span></label>
+        <input type="text" id="accManager" placeholder="Name and email of approving manager" />
+      </div>
+      <div class="field">
+        <label for="accDate">Access Needed By</label>
+        <input type="date" id="accDate" />
+      </div>
+    </div>
+    <div class="field">
+      <label for="accNotes">Additional Notes <span class="hint">(optional)</span></label>
+      <textarea id="accNotes" placeholder="Any special permissions, provisioning notes, or restrictions..." style="min-height:70px;"></textarea>
+    </div>
+  </div>
+
+  <div class="btn-row">
+    <button class="btn btn-ghost" onclick="goToStep(2)">← Back</button>
+    <button class="btn btn-primary" onclick="goToStep(4)">Review & Submit →</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════ STEP 4 ════════════════════════════════ -->
+<div class="card hidden" id="step4">
+  <div class="card-title">Review Your Submission</div>
+  <div class="card-subtitle">Please confirm everything looks correct before submitting.</div>
+
+  <div id="reviewContent" style="font-size:14px; line-height:1.7;"></div>
+
+  <div class="btn-row">
+    <button class="btn btn-ghost" onclick="goToStep(3)">← Edit Details</button>
+    <button class="btn btn-primary" onclick="submitForm()">✔ Submit Request</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════ SUCCESS ════════════════════════════════ -->
+<div class="success-card hidden" id="successCard">
+  <div class="success-icon">✅</div>
+  <h2>Request Submitted!</h2>
+  <p>Thank you — your request has been received by the WGU Academy team.</p>
+  <p>You'll receive a confirmation email shortly and can expect a follow-up within <strong>2–3 business days</strong>.</p>
+  <div class="ref-badge" id="refBadge"></div>
+  <br>
+  <button class="btn btn-primary" onclick="resetForm()">Submit Another Request</button>
+</div>
+
+<script>
+  /* ── State ── */
+  let category = '', subType = '';
+
+  /* ── Category sub-type map ── */
+  const subMap = {
+    Technology:  'subTech',
+    Improvement: 'subImprov',
+    Course:      'subCourse',
+    Account:     'subAccount'
+  };
+
+  /* ── Fields that apply for each sub-type (for review & validation) ── */
+  const fieldSets = {
+    Integration:      'fields-Integration',
+    Feature:          'fields-Feature',
+    Bug:              'fields-Bug',
+    Salesforce:       'fields-Salesforce',
+    Staff:            'fields-Improvement',
+    Student:          'fields-Improvement',
+    'New Course':     'fields-New Course',
+    'Edit Course':    'fields-Edit Course',
+    'Sunset Course':  'fields-Sunset Course',
+    'Salesforce Access': 'fields-Account',
+    'Tableau Access':    'fields-Account',
+    'Other Access':      'fields-Account'
+  };
+
+  const improvSubLabels = { Staff: 'Staff-Facing Improvement', Student: 'Student-Facing Improvement' };
+
+  /* ── Step 1: choose category ── */
+  function selectCategory(el) {
+    document.querySelectorAll('.tile').forEach(t => t.classList.remove('selected'));
+    el.classList.add('selected');
+    category = el.dataset.cat;
+    subType = '';
+    document.getElementById('step1Next').disabled = false;
+  }
+
+  /* ── Step 2: choose sub-type ── */
+  function selectSub(el) {
+    el.closest('.pill-group').querySelectorAll('.pill').forEach(p => p.classList.remove('selected'));
+    el.classList.add('selected');
+    subType = el.dataset.sub;
+    document.getElementById('step2Next').disabled = false;
+  }
+
+  /* ── Navigation ── */
+  function goToStep(n) {
+    if (n === 3 && !subType) return;
+    if (n === 4) {
+      if (!validateStep3()) return;
+      buildReview();
+    }
+    ['step1','step2','step3','step4','successCard'].forEach(id => {
+      document.getElementById(id).classList.add('hidden');
+    });
+    if (n === 1) {
+      document.getElementById('step1').classList.remove('hidden');
+    } else if (n === 2) {
+      prepStep2();
+      document.getElementById('step2').classList.remove('hidden');
+    } else if (n === 3) {
+      prepStep3();
+      document.getElementById('step3').classList.remove('hidden');
+    } else if (n === 4) {
+      document.getElementById('step4').classList.remove('hidden');
+    }
+    updateProgress(n);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function prepStep2() {
+    const titles = { Technology: 'Technology Request Type', Improvement: 'Who is this improvement for?', Course: 'Course Request Type', Account: 'Select a Platform' };
+    const subs   = { Technology: 'Select the specific type of technology request.', Improvement: 'Choose whether this improvement affects staff or students.', Course: 'What type of course request is this?', Account: 'Which platform do you need access to?' };
+    document.getElementById('step2Title').textContent = titles[category] || 'Select a type';
+    document.getElementById('step2Sub').textContent   = subs[category]  || '';
+    Object.values(subMap).forEach(id => document.getElementById(id).classList.add('hidden'));
+    if (subMap[category]) document.getElementById(subMap[category]).classList.remove('hidden');
+    document.querySelectorAll('.pill').forEach(p => p.classList.remove('selected'));
+    document.getElementById('step2Next').disabled = true;
+    subType = '';
+  }
+
+  function prepStep3() {
+    // hide all field sets
+    document.querySelectorAll('[id^="fields-"]').forEach(el => el.classList.add('hidden'));
+    const fsId = fieldSets[subType];
+    if (fsId) document.getElementById(fsId).classList.remove('hidden');
+
+    // For account: show/hide platform field
+    const isSF  = subType === 'Salesforce Access';
+    const isTBL = subType === 'Tableau Access';
+    const isOth = subType === 'Other Access';
+    const platformField = document.getElementById('accountPlatformLabel');
+    if (platformField) {
+      if (isSF || isTBL) {
+        platformField.classList.add('hidden');
+      } else {
+        platformField.classList.remove('hidden');
+      }
+    }
+
+    // Title
+    const titles = {
+      Integration: '🔗 Integration Request',
+      Feature: '✨ Feature Request',
+      Bug: '🐛 Bug Report',
+      Salesforce: '☁️ Salesforce Request',
+      Staff: '👩‍💼 Staff Improvement',
+      Student: '🎓 Student Improvement',
+      'New Course': '➕ New Course Idea',
+      'Edit Course': '✏️ Edit a Course',
+      'Sunset Course': '🌅 Sunset a Course',
+      'Salesforce Access': '☁️ Salesforce Access Request',
+      'Tableau Access': '📊 Tableau Access Request',
+      'Other Access': '🔐 Access Request'
+    };
+    document.getElementById('step3Title').textContent = titles[subType] || 'Request Details';
+  }
+
+  /* ── Validation ── */
+  const reqFields = {
+    Integration:       ['contactName','contactEmail','contactDept','intName','intDesc','intBusiness','intPriority'],
+    Feature:           ['contactName','contactEmail','contactDept','featName','featDesc','featJustify','featPriority'],
+    Bug:               ['contactName','contactEmail','contactDept','bugTitle','bugSystem','bugSteps','bugExpected','bugSeverity'],
+    Salesforce:        ['contactName','contactEmail','contactDept','sfType','sfDesc','sfJustify','sfPriority'],
+    Staff:             ['contactName','contactEmail','contactDept','impTitle','impDesc','impOkr','impOutcome','impPriority'],
+    Student:           ['contactName','contactEmail','contactDept','impTitle','impDesc','impOkr','impOutcome','impPriority'],
+    'New Course':      ['contactName','contactEmail','contactDept','ncTitle','ncDesc','ncAudience','ncRationale'],
+    'Edit Course':     ['contactName','contactEmail','contactDept','ecCourseName','ecEditType','ecDesc','ecReason','ecPriority'],
+    'Sunset Course':   ['contactName','contactEmail','contactDept','scCourseName','scReason','scDate'],
+    'Salesforce Access': ['contactName','contactEmail','contactDept','accWho','accRole','accLevel','accJustify','accManager'],
+    'Tableau Access':    ['contactName','contactEmail','contactDept','accWho','accRole','accLevel','accJustify','accManager'],
+    'Other Access':      ['contactName','contactEmail','contactDept','accPlatformOther','accWho','accRole','accLevel','accJustify','accManager'],
+  };
+
+  function validateStep3() {
+    const fields = reqFields[subType] || [];
+    let valid = true;
+    // clear old errors
+    document.querySelectorAll('input.invalid, select.invalid, textarea.invalid').forEach(el => el.classList.remove('invalid'));
+    document.querySelectorAll('.field-error').forEach(el => el.remove());
+
+    // radio check for Feature audience
+    if (subType === 'Feature') {
+      const radios = document.querySelectorAll('input[name="featAudience"]');
+      const checked = [...radios].some(r => r.checked);
+      if (!checked) {
+        const rg = document.querySelector('.radio-group');
+        if (rg && !rg.querySelector('.field-error')) {
+          const err = document.createElement('span');
+          err.className = 'field-error';
+          err.textContent = 'Please select an audience.';
+          rg.parentElement.appendChild(err);
+        }
+        valid = false;
+      }
+    }
+
+    fields.forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      if (!el.value.trim()) {
+        el.classList.add('invalid');
+        if (!el.parentElement.querySelector('.field-error')) {
+          const err = document.createElement('span');
+          err.className = 'field-error';
+          err.textContent = 'This field is required.';
+          el.parentElement.appendChild(err);
+        }
+        valid = false;
+      }
+    });
+    if (!valid) {
+      const firstErr = document.querySelector('.invalid');
+      if (firstErr) firstErr.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    return valid;
+  }
+
+  /* ── Review builder ── */
+  function val(id) {
+    const el = document.getElementById(id);
+    return el ? (el.value.trim() || '—') : '—';
+  }
+  function radio(name) {
+    const el = document.querySelector(`input[name="${name}"]:checked`);
+    return el ? el.value : '—';
+  }
+
+  function row(label, value) {
+    if (!value || value === '—') return '';
+    return `<div style="display:flex;gap:12px;padding:7px 0;border-bottom:1px solid var(--border);">
+      <div style="width:200px;flex-shrink:0;font-weight:600;color:var(--muted);font-size:12px;text-transform:uppercase;letter-spacing:.4px;padding-top:2px;">${label}</div>
+      <div style="color:var(--text);flex:1;">${value}</div>
+    </div>`;
+  }
+
+  function section(title, rows) {
+    return `<div style="margin-bottom:20px;">
+      <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.7px;color:var(--blue);margin-bottom:4px;">${title}</div>
+      ${rows}
+    </div>`;
+  }
+
+  function buildReview() {
+    const catLabel = subType + (category === 'Improvement' ? ` (${category})` : '');
+    let contact = section('Contact Info',
+      row('Name', val('contactName')) +
+      row('Email', val('contactEmail')) +
+      row('Department', val('contactDept'))
+    );
+
+    let details = '';
+
+    if (subType === 'Integration') {
+      details = section('Integration Request',
+        row('Integration Name', val('intName')) +
+        row('Description', val('intDesc')) +
+        row('Business Justification', val('intBusiness')) +
+        row('Priority', val('intPriority')) +
+        row('Target Date', val('intDate')) +
+        row('Stakeholders', val('intStakeholders'))
+      );
+    } else if (subType === 'Feature') {
+      details = section('Feature Request',
+        row('Feature Name', val('featName')) +
+        row('Description', val('featDesc')) +
+        row('Business Justification', val('featJustify')) +
+        row('Audience', radio('featAudience')) +
+        row('Priority', val('featPriority')) +
+        row('Target Date', val('featDate')) +
+        row('References', val('featAttach'))
+      );
+    } else if (subType === 'Bug') {
+      details = section('Bug Report',
+        row('Bug Title', val('bugTitle')) +
+        row('Affected System', val('bugSystem')) +
+        row('Steps to Reproduce', val('bugSteps')) +
+        row('Expected vs. Actual', val('bugExpected')) +
+        row('Severity', val('bugSeverity')) +
+        row('Users Affected', val('bugUsers')) +
+        row('Environment', val('bugEnv')) +
+        row('Additional Notes', val('bugNotes'))
+      );
+    } else if (subType === 'Salesforce') {
+      details = section('Salesforce Request',
+        row('Request Type', val('sfType')) +
+        row('Description', val('sfDesc')) +
+        row('Business Need', val('sfJustify')) +
+        row('Priority', val('sfPriority')) +
+        row('Target Date', val('sfDate')) +
+        row('Who Will Use This', val('sfUsers'))
+      );
+    } else if (subType === 'Staff' || subType === 'Student') {
+      details = section(`${subType}-Facing Improvement`,
+        row('Title', val('impTitle')) +
+        row('Description', val('impDesc')) +
+        row('OKR / Strategic Goal', val('impOkr')) +
+        row('Expected Outcome', val('impOutcome')) +
+        row('Current Pain Points', val('impCurrentPain')) +
+        row('Priority', val('impPriority')) +
+        row('Target Date', val('impDate')) +
+        row('Stakeholders', val('impStakeholders'))
+      );
+    } else if (subType === 'New Course') {
+      details = section('New Course Idea',
+        row('Proposed Title', val('ncTitle')) +
+        row('Description', val('ncDesc')) +
+        row('Target Audience', val('ncAudience')) +
+        row('Rationale', val('ncRationale')) +
+        row('SME', val('ncSME')) +
+        row('Launch Date', val('ncDate')) +
+        row('Credits / Length', val('ncCredits')) +
+        row('Additional Notes', val('ncNotes'))
+      );
+    } else if (subType === 'Edit Course') {
+      details = section('Course Edit Request',
+        row('Course Name / ID', val('ecCourseName')) +
+        row('Type of Edit', val('ecEditType')) +
+        row('Changes Requested', val('ecDesc')) +
+        row('Reason for Edit', val('ecReason')) +
+        row('Priority', val('ecPriority')) +
+        row('Completion Date', val('ecDate')) +
+        row('SME / Owner', val('ecSME'))
+      );
+    } else if (subType === 'Sunset Course') {
+      details = section('Course Sunset Request',
+        row('Course Name / ID', val('scCourseName')) +
+        row('Reason for Sunsetting', val('scReason')) +
+        row('Enrollment Impact', val('scStudents')) +
+        row('Replacement Course', val('scReplacement')) +
+        row('Proposed Sunset Date', val('scDate')) +
+        row('Approver', val('scApprover')) +
+        row('Additional Notes', val('scNotes'))
+      );
+    } else if (['Salesforce Access','Tableau Access','Other Access'].includes(subType)) {
+      const platformName = subType === 'Salesforce Access' ? 'Salesforce' : subType === 'Tableau Access' ? 'Tableau' : val('accPlatformOther');
+      details = section(`Access Request — ${platformName}`,
+        row('Platform', platformName) +
+        row('Who Needs Access', val('accWho')) +
+        row('Role / Title', val('accRole')) +
+        row('Access Level', val('accLevel')) +
+        row('Business Justification', val('accJustify')) +
+        row('Manager / Approver', val('accManager')) +
+        row('Access Needed By', val('accDate')) +
+        row('Additional Notes', val('accNotes'))
+      );
+    }
+
+    const metaRow = `<div style="background:var(--blue-lt);border:1px solid var(--border);border-radius:6px;padding:12px 16px;margin-bottom:20px;font-size:13px;color:var(--navy);">
+      <strong>Category:</strong> ${category} &nbsp;·&nbsp; <strong>Type:</strong> ${subType}
+    </div>`;
+
+    document.getElementById('reviewContent').innerHTML = metaRow + contact + details;
+  }
+
+  /* ── Submit ── */
+  function submitForm() {
+    const ref = 'WGA-' + new Date().getFullYear() + '-' + String(Math.floor(Math.random()*90000)+10000);
+    document.getElementById('refBadge').textContent = 'Reference #: ' + ref;
+    ['step1','step2','step3','step4'].forEach(id => document.getElementById(id).classList.add('hidden'));
+    document.getElementById('successCard').classList.remove('hidden');
+    updateProgress(5);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /* ── Reset ── */
+  function resetForm() {
+    category = ''; subType = '';
+    document.querySelectorAll('input[type="text"], input[type="email"], input[type="date"], textarea').forEach(el => el.value = '');
+    document.querySelectorAll('select').forEach(el => el.selectedIndex = 0);
+    document.querySelectorAll('input[type="radio"]').forEach(el => el.checked = false);
+    document.querySelectorAll('.tile.selected, .pill.selected').forEach(el => el.classList.remove('selected'));
+    document.getElementById('step1Next').disabled = true;
+    document.getElementById('step2Next').disabled = true;
+    ['step2','step3','step4','successCard'].forEach(id => document.getElementById(id).classList.add('hidden'));
+    document.getElementById('step1').classList.remove('hidden');
+    updateProgress(1);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  /* ── Progress bar ── */
+  function updateProgress(step) {
+    for (let i = 1; i <= 4; i++) {
+      const dot  = document.getElementById('dot'  + i);
+      const line = document.getElementById('line' + i);
+      dot.classList.remove('active','done');
+      if (line) line.classList.remove('done');
+      if (step > i) {
+        dot.classList.add('done');
+        dot.textContent = '✓';
+        if (line) line.classList.add('done');
+      } else if (step === i) {
+        dot.classList.add('active');
+        dot.textContent = i;
+      } else {
+        dot.textContent = i;
+      }
+    }
+  }
+
+  /* ── Remove validation error on input ── */
+  document.addEventListener('input', function(e) {
+    if (e.target.classList.contains('invalid')) {
+      e.target.classList.remove('invalid');
+      const err = e.target.parentElement.querySelector('.field-error');
+      if (err) err.remove();
+    }
+  });
+  document.addEventListener('change', function(e) {
+    if (e.target.classList.contains('invalid')) {
+      e.target.classList.remove('invalid');
+      const err = e.target.parentElement.querySelector('.field-error');
+      if (err) err.remove();
+    }
+  });
+</script>
+</body>
+</html>
